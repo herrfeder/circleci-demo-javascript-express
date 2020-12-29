@@ -1,0 +1,42 @@
+Resources:
+  SECGROUPEC2:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow Ingress ssh and Egress all Ports
+      VpcId: "vpc-95c99fed"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          exec > >(tee /var/log/cloud-init-output.log | logger -t cloud-init-output -s 2>/dev/console) 2>&1
+          apt-get update -y
+          apt-g et install unzip awscli -y
+      ImageId: ami-0f2df2b26145eec88
+      InstanceType: t2.micro
+      KeyName: ssh_access
+      Tags:
+        - Key: Project 
+          Value: udacity
+      NetworkInterfaces: 
+      - AssociatePublicIpAddress: "true"
+        DeviceIndex: "0"
+        GroupSet: 
+        - Ref: SECGROUPEC2

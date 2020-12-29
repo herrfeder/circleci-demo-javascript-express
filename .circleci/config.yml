@@ -11,7 +11,7 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file aws_template.yml \
-              --stack-name circleciawstemplate
+              --stack-name circleciawstest
 workflows:
   my_workflow:
     jobs:
